@@ -56,5 +56,5 @@ def identify_intent(intents_list, intents_json):
 def identify_intent_from_message(msg):
     predicted_class = predict_class(msg)
     result = identify_intent(predicted_class, intents)
-    return result
+    return str(result)
 
