@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from FirstAi import get_response
+from utils import get_response
 
 app = Flask(__name__)
 
