@@ -1,0 +1,20 @@
+{"intents": [
+  {"tag": "greetings",
+  "patterns": ["hello", "hi", "good day", "hey", "good morning", "good evening"],
+  "responses":  ["greeting"]},
+  {"tag": "review",
+  "patterns": ["I want to leave a review", "I like this product", "good product", "how can I leave a review", "where can I leave a review", "review please"],
+  "responses":  ["review"]},
+  {"tag": "complaint",
+  "patterns": ["I have a complaint", "your product sucks", "I want to talk to customer support", "customer support", "I want to talk to the manager", "My order is faulty", "this product doesnt work"],
+  "responses":  ["complaint"]},
+  {"tag": "question",
+  "patterns": ["what is the refund policy", "what is the most popular product", "why should I buy from you", "how long does shipping take", "how long does delivery take", "is the product safe", "what are your security features"],
+  "responses":  ["question"]},
+  {"tag": "tracking",
+  "patterns": ["track my package", "I want to track an order", "where is my package", "where is my order", "where order", "track order", "when will my order arrive", "I want a shipping update"],
+  "responses":  ["tracking"]},
+  {"tag": "cancel",
+  "patterns": ["cancel", "stop", "go back"],
+  "responses":  ["cancel"]}
+]}
