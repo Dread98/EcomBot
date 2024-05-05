@@ -32,7 +32,7 @@ pickle.dump(words_list, open('words.pkl', 'wb'))  # save to pickle files
 pickle.dump(classes, open('classes.pkl', 'wb'))
 
 training = []
-outputEmpty = [0] * len(classes)    # sets up empty numerical representation
+empty_output = [0] * len(classes)    # sets up empty numerical representation
 
 for document in documents:
     bag = []
@@ -41,9 +41,9 @@ for document in documents:
     for word in words_list:
         bag.append(1) if word in word_patterns else bag.append(0)   # adds words to list
 
-    outputRow = list(outputEmpty)
-    outputRow[classes.index(document[1])] = 1
-    training.append(bag + outputRow)    # populates the training data with the bag of words and its corresponding row
+    output_row = list(empty_output)
+    output_row[classes.index(document[1])] = 1
+    training.append(bag + output_row)    # populates the training data with the bag of words and its corresponding row
 
 random.shuffle(training)
 training = np.array(training)   # convert to numpy array
