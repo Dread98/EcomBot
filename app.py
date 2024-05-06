@@ -12,63 +12,67 @@ def index_get():
 
 @app.post("/predict")
 def predict():
-    input_message = request.get_json().get("message")
-    predicted_user_intent = identify_intent_from_message(input_message)
-    chatbot_response = "There seems to have been an error. My apologies"
-    conversation_tracking_cookie = request.cookies.get("conversationStage")
-    print(conversation_tracking_cookie)
-    print(predicted_user_intent)
-    if predicted_user_intent == "['cancel']":
-        conversation_tracking_cookie = ""
-        chatbot_response = "task cancelled, what would you like to do next?"
+    user_message = request.get_json().get("message")
+    predicted_user_intent = identify_intent_from_message(user_message)
+    response_text = "There seems to have been an error. My apologies"
+    current_conversation_stage = request.cookies.get("conversationStage")
 
-    elif conversation_tracking_cookie is not None:
-        chatbot_response = continue_conversation(input_message, conversation_tracking_cookie)
+    if predicted_user_intent == "['cancel']":
+        current_conversation_stage = ""
+        response_text = "task cancelled, what would you like to do next?"
+
+    elif current_conversation_stage is not "":
+        continued_conversation = continue_conversation(user_message, current_conversation_stage)
+        current_conversation_stage = continued_conversation[1]
+        response_text = continued_conversation[0]
 
     else:
         match predicted_user_intent:
             case "['question']":
-                conversation_tracking_cookie = ""
-                chatbot_response = get_response(input_message)
+                current_conversation_stage = ""
+                response_text = get_response(user_message)
             case "['tracking']":
-                conversation_tracking_cookie = "t1"
-                chatbot_response = "Lets find your package, what is your order tracking number?"
+                current_conversation_stage = "t1"
+                response_text = "Lets find your package, what is your order tracking number?"
             case "['complaint']":
-                conversation_tracking_cookie = "c1"
-                chatbot_response = "I'm sorry to hear that you have had a problem with our product, if you have a question " \
-                           "that you think I could help with type '"'question'"', if you want me to raise a support " \
-                           "ticket for you type '"'ticket'"'"
+                current_conversation_stage = "c1"
+                response_text = "I'm sorry to hear that you have had a problem with our product, if you have a " \
+                                   "question that you think I could help with type '"'question'"', if you want me to " \
+                                   "raise a support ticket for you type '"'ticket'"'"
             case "['review']":
-                conversation_tracking_cookie = "r1"
-                chatbot_response = "Excellent lets start writing your review, what is your first name"
-    re = make_response(chatbot_response)
-    re.set_cookie("conversationStage", conversation_tracking_cookie)
-    return re
+                current_conversation_stage = "r1"
+                response_text = "Excellent lets start writing your review, what is your first name"
+
+    chatbot_response_with_cookies = make_response(response_text)
+    chatbot_response_with_cookies.set_cookie("conversationStage", current_conversation_stage)
+    return chatbot_response_with_cookies
 
 
 @app.route("/trackingStubEndpoint/<tracking_number>")
 def track(tracking_number):
     royal_mail_stub_api_response = {
-        "orderStatus": "string",
-        "shippedOn": "2019-08-24T14:15:22Z",
-        "shippingDetails": {
-          "trackingNumber": tracking_number,
-          "shippingTrackingStatus": "string",
-          "serviceCode": "string",
-          "shippingService": "string",
-          "shippingCarrier": "string",
-          "receiveEmailNotification": True,
-          "receiveSmsNotification": True,
-          "guaranteedSaturdayDelivery": True,
-          "requestSignatureUponDelivery": True,
-          "isLocalCollect": True
-        }
-      }
+                                    "orderStatus": "string",
+                                    "shippedOn": "2019-08-24T14:15:22Z",
+                                    "shippingDetails": {
+                                      "trackingNumber": tracking_number,
+                                      "shippingTrackingStatus": "string",
+                                      "serviceCode": "string",
+                                      "shippingService": "string",
+                                      "shippingCarrier": "string",
+                                      "receiveEmailNotification": True,
+                                      "receiveSmsNotification": True,
+                                      "guaranteedSaturdayDelivery": True,
+                                      "requestSignatureUponDelivery": True,
+                                      "isLocalCollect": True
+                                    }
+                                  }
+
     valid_order_numbers = ["JV620553954GB",
                            "050111C31F4",
                            "32048619500001B3A6F40",
                            "0210DAD9015248A2",
                            "0B0480284000010307090"]
+
     if tracking_number in valid_order_numbers:
         return jsonify(royal_mail_stub_api_response), 200
     else:
