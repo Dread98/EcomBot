@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from utils import get_response
 from intentIdentifier import identify_intent_from_message
 
@@ -38,8 +38,9 @@ def predict():
         case "['review']":
             conversation_stage_tracker = "r1"
             response = "Excellent lets start writing your review, what is your first name"
-    message = {"answer": response}
-    return jsonify(message)
+    re = make_response(response)
+    re.set_cookie("mycookie", "newestvalue")
+    return re
 
 
 if __name__ == "__main__":

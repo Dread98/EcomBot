@@ -55,9 +55,9 @@ class Chatbox {
                     'Content-Type': 'application/json'
                 },
             });
-            const data = await response.json(); // Parse the response JSON
+            const data = await response.text(); // Parse the response JSON
             console.log(data);
-            let msg2 = { name: "Sam", message: data.answer };
+            let msg2 = { name: "Sam", message: data };
             this.messages.push(msg2);
             this.updateChatText(chatbox);
             textField.value = '';
