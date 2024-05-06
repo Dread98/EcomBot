@@ -21,7 +21,7 @@ def predict():
         current_conversation_stage = ""
         response_text = "task cancelled, what would you like to do next?"
 
-    elif current_conversation_stage is not "":
+    elif current_conversation_stage != "":
         continued_conversation = continue_conversation(user_message, current_conversation_stage)
         current_conversation_stage = continued_conversation[1]
         response_text = continued_conversation[0]
@@ -42,6 +42,12 @@ def predict():
             case "['review']":
                 current_conversation_stage = "r1"
                 response_text = "Excellent lets start writing your review, what is your first name"
+            case "['thanks']":
+                current_conversation_stage = ""
+                response_text = "You're welcome, have a nice day!"
+            case "['greeting']":
+                current_conversation_stage = ""
+                response_text = "Hello, what can I help you with today?"
 
     chatbot_response_with_cookies = make_response(response_text)
     chatbot_response_with_cookies.set_cookie("conversationStage", current_conversation_stage)

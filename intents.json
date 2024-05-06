@@ -16,5 +16,8 @@
   "responses":  ["tracking"]},
   {"tag": "cancel",
   "patterns": ["cancel", "stop", "go back"],
-  "responses":  ["cancel"]}
+  "responses":  ["cancel"]},
+  {"tag": "thanks",
+  "patterns": ["thank you", "cheers", "thanks very much"],
+  "responses":  ["thanks"]}
 ]}

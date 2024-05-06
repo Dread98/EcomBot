@@ -8,7 +8,7 @@ from langchain_community.llms import OpenAI
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from flask import Flask, request, jsonify
-from openai import OpenAI
+from openai import OpenAI as OpenAI2
 
 import constants
 
@@ -81,7 +81,7 @@ def track_order(input_message):
 
     if tracking_information.status_code == 200:
         all_order_data = tracking_information.json()
-        client = OpenAI(api_key=constants.APIKEY)
+        client = OpenAI2(api_key=constants.APIKEY)
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
