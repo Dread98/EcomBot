@@ -16,14 +16,23 @@ def predict():
     predicted_user_intent = identify_intent_from_message(user_message)
     response_text = "There seems to have been an error. My apologies"
     current_conversation_stage = request.cookies.get("conversationStage")
-    conversation_history = request.cookies.get("chatHistory")
+    chat_history = request.cookies.get("chatHistory")
+    spam_tracker = request.cookies.get("spamTracker")
+    print(predicted_user_intent)
+    if spam_tracker:
+        spam_tracker = str(int(spam_tracker) + 1)
+    else:
+        spam_tracker = "1"
 
-    if predicted_user_intent == "['cancel']":
+    if int(spam_tracker) >= 3:
+        response_text = "You have spammed the chatbot, slow down or your messages won't be processed"
+
+    elif predicted_user_intent == "['cancel']":
         current_conversation_stage = ""
         response_text = "task cancelled, what would you like to do next?"
 
     elif current_conversation_stage:
-        continued_conversation = continue_conversation(user_message, current_conversation_stage, conversation_history)
+        continued_conversation = continue_conversation(user_message, current_conversation_stage, chat_history)
         current_conversation_stage = continued_conversation[1]
         response_text = continued_conversation[0]
 
@@ -52,8 +61,10 @@ def predict():
 
     chatbot_response_with_cookies = make_response(response_text)
     chatbot_response_with_cookies.set_cookie("conversationStage", current_conversation_stage)
-    if conversation_history:
-        updated_history = conversation_history + "|" + user_message
+    chatbot_response_with_cookies.set_cookie("spamTracker", spam_tracker, max_age=3)
+
+    if chat_history:
+        updated_history = chat_history + "|" + user_message
         chatbot_response_with_cookies.set_cookie("chatHistory", updated_history)
     else:
         chatbot_response_with_cookies.set_cookie("chatHistory", user_message)
