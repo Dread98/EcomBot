@@ -1,8 +1,8 @@
-import random
 import json
 import pickle
-import numpy as np
 import nltk
+import numpy as np
+
 from nltk.stem import WordNetLemmatizer
 from tensorflow.keras.models import load_model
 
@@ -21,7 +21,7 @@ def process_input(sentence): # tokenize and process the input data
     return input_words
 
 
-def make_bag(sentence): # if a word from the input matches the one in the bag indicate that with a 1
+def make_bag(sentence):  # if a word from the input matches the one in the bag indicate that with a 1
     sentence_words = process_input(sentence)
     bag = [0] * len(words)
     for w in sentence_words:
@@ -39,7 +39,8 @@ def predict_class(sentence):
     results.sort(key=lambda x: x[1], reverse=True)
     predicted_class = []
     for r in results:
-        predicted_class.append({'intent': classes[r[0]], 'probability': str(r[1])}) # returns the highest probability case that is above 25% and displays its probability
+        predicted_class.append({'intent': classes[r[0]], 'probability': str(r[1])})
+        # returns the highest probability case that is above 25% and displays its probability
     return predicted_class
 
 

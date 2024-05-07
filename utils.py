@@ -135,8 +135,8 @@ def track_order(input_message):
                 {"role": "user", "content": str(all_order_data)}
             ]
         )
-        a = response.choices[0].message.content
-        return a, ""
+        openai_answer = response.choices[0].message.content
+        return openai_answer, ""
 
     elif tracking_information.status_code == 404:
         return ("Im afraid we couldn't find an order with tracking code: "

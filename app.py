@@ -18,7 +18,6 @@ def predict():
     current_conversation_stage = request.cookies.get("conversationStage")
     chat_history = request.cookies.get("chatHistory")
     spam_tracker = request.cookies.get("spamTracker")
-    print(predicted_user_intent)
     if spam_tracker:
         spam_tracker = str(int(spam_tracker) + 1)
     else:
@@ -74,14 +73,14 @@ def predict():
 @app.route("/trackingStubEndpoint/<tracking_number>")
 def track(tracking_number):
     royal_mail_stub_api_response = {
-                                    "orderStatus": "string",
-                                    "shippedOn": "2019-08-24T14:15:22Z",
+                                    "orderStatus": "in transit",
+                                    "shippedOn": "2024-03-24T14:15:22Z",
                                     "shippingDetails": {
                                       "trackingNumber": tracking_number,
                                       "shippingTrackingStatus": "string",
                                       "serviceCode": "string",
                                       "shippingService": "string",
-                                      "shippingCarrier": "string",
+                                      "shippingCarrier": "Royal Mail",
                                       "receiveEmailNotification": True,
                                       "receiveSmsNotification": True,
                                       "guaranteedSaturdayDelivery": True,
