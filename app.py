@@ -16,13 +16,22 @@ def predict():
     predicted_user_intent = identify_intent_from_message(user_message)
     response_text = "There seems to have been an error. My apologies"
     current_conversation_stage = request.cookies.get("conversationStage")
+    chat_history = request.cookies.get("chatHistory")
+    spam_tracker = request.cookies.get("spamTracker")
+    if spam_tracker:
+        spam_tracker = str(int(spam_tracker) + 1)
+    else:
+        spam_tracker = "1"
 
-    if predicted_user_intent == "['cancel']":
+    if int(spam_tracker) >= 3:
+        response_text = "You have spammed the chatbot, slow down or your messages won't be processed"
+
+    elif predicted_user_intent == "['cancel']":
         current_conversation_stage = ""
         response_text = "task cancelled, what would you like to do next?"
 
-    elif current_conversation_stage != "":
-        continued_conversation = continue_conversation(user_message, current_conversation_stage)
+    elif current_conversation_stage:
+        continued_conversation = continue_conversation(user_message, current_conversation_stage, chat_history)
         current_conversation_stage = continued_conversation[1]
         response_text = continued_conversation[0]
 
@@ -51,20 +60,27 @@ def predict():
 
     chatbot_response_with_cookies = make_response(response_text)
     chatbot_response_with_cookies.set_cookie("conversationStage", current_conversation_stage)
+    chatbot_response_with_cookies.set_cookie("spamTracker", spam_tracker, max_age=3)
+
+    if chat_history:
+        updated_history = chat_history + "|" + user_message
+        chatbot_response_with_cookies.set_cookie("chatHistory", updated_history)
+    else:
+        chatbot_response_with_cookies.set_cookie("chatHistory", user_message)
     return chatbot_response_with_cookies
 
 
 @app.route("/trackingStubEndpoint/<tracking_number>")
 def track(tracking_number):
     royal_mail_stub_api_response = {
-                                    "orderStatus": "string",
-                                    "shippedOn": "2019-08-24T14:15:22Z",
+                                    "orderStatus": "in transit",
+                                    "shippedOn": "2024-03-24T14:15:22Z",
                                     "shippingDetails": {
                                       "trackingNumber": tracking_number,
                                       "shippingTrackingStatus": "string",
                                       "serviceCode": "string",
                                       "shippingService": "string",
-                                      "shippingCarrier": "string",
+                                      "shippingCarrier": "Royal Mail",
                                       "receiveEmailNotification": True,
                                       "receiveSmsNotification": True,
                                       "guaranteedSaturdayDelivery": True,
@@ -87,19 +103,16 @@ def track(tracking_number):
 
 @app.route("/reviewStubEndpoint", methods=["POST"])
 def save_review():  # This is a stub API representing the review being successfully uploaded to the reviews database/spreadsheet
-    data = request.get_json()
-    print("Review raised for " + data.name
-          + " for product " + data.product
-          + " with a review of " + data.stars
-          + " stars and content: " + data.content)
+    data = request.data
+    print(data)
+    return "review created", 200
 
 
 @app.route("/supportStubEndpoint", methods=["POST"])
 def raise_ticket():  # This is a stub API representing the ticket being successfully uploaded to the support database
-    data = request.get_json()
-    print("Support Ticket raised for " + data.name
-          + " with contact details: " + data.email
-          + " with content: " + data.content)
+    data = request.data
+    print(data)
+    return "ticket raised", 200
 
 
 if __name__ == "__main__":

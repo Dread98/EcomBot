@@ -47,32 +47,73 @@ def digest_and_format_company_data(name):
     return formatted_document_data
 
 
-def continue_conversation(input_message, conversation_stage):
+def continue_conversation(input_message, conversation_stage, conversation_history):
     next_stage = ""
+    response = "error"
     match conversation_stage:
         case "t1":
             response_and_stage = track_order(input_message)
             response = response_and_stage[0]
             next_stage = response_and_stage[1]
             return response, next_stage
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
-        case "['question']":
-            conversation_tracking_cookie = ""
-            chatbot_response = get_response(input_message)
+        case "r1":
+            next_stage = "r2"
+            response = "Thank you " + input_message + " next can you tell me which product you want to review?"
+        case "r2":
+            next_stage = "r3"
+            response = "Fantastic, what star rating out of 5 would you give " + input_message + "?"
+        case "r3":
+            next_stage = "r4"
+            response = "Excellent, finally could you please write a sentence " \
+                       "or two about your experience with the product?"
+        case "r4":
+            post_review(conversation_history, input_message)
+            next_stage = ""
+            response = "Thank you for taking the time to review our product, " \
+                       "we appreciate your feedback and have a great day!"
+        case "c1":
+            if input_message == "question":
+                next_stage = ""
+                response = "Of course, ask away and I'll answer to the best of my abilities"
+            else:
+                next_stage = "c2"
+                response = "Sorry that I couldn't help you resolve your issue, lets raise a support ticket. Firstly, " \
+                           "can I please have a contact email that we can reach you through?"
+        case "c2":
+            next_stage = "c3"
+            response = "Thank you, next can you write a short description of the issue you've had with our service?"
+        case "c3":
+            raise_ticket(conversation_history, input_message)
+            next_stage = ""
+            response = "I've raised a support ticket with your complaint, we will reach out to you as soon as " \
+                       "possible to help resolve your problem. Have a nice day!"
+    return response, next_stage
+
+
+def post_review(conversation_history, input_message):
+    review_data = (conversation_history.split("|"))
+    review_data.append(input_message)
+    review_json = {
+        'name': review_data[-4],
+        'product': review_data[-3],
+        'starRating': review_data[-2],
+        'reviewContent': review_data[-1]
+    }
+    requests.post("http://127.0.0.1:5000/reviewStubEndpoint",
+                  data=review_json,
+                  headers={"Content-Type": "application/json"})
+
+
+def raise_ticket(conversation_history, input_message):
+    ticket_data = (conversation_history.split("|"))
+    ticket_data.append(input_message)
+    ticket_json = {
+        "email": ticket_data[-2],
+        "complaint": ticket_data[-1]
+    }
+    requests.post(url="http://127.0.0.1:5000/supportStubEndpoint",
+                  data=ticket_json,
+                  headers={"Content-Type": "application/json"})
 
 
 def track_order(input_message):
@@ -94,8 +135,8 @@ def track_order(input_message):
                 {"role": "user", "content": str(all_order_data)}
             ]
         )
-        a = response.choices[0].message.content
-        return a, ""
+        openai_answer = response.choices[0].message.content
+        return openai_answer, ""
 
     elif tracking_information.status_code == 404:
         return ("Im afraid we couldn't find an order with tracking code: "
