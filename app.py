@@ -16,13 +16,14 @@ def predict():
     predicted_user_intent = identify_intent_from_message(user_message)
     response_text = "There seems to have been an error. My apologies"
     current_conversation_stage = request.cookies.get("conversationStage")
+    conversation_history = request.cookies.get("chatHistory")
 
     if predicted_user_intent == "['cancel']":
         current_conversation_stage = ""
         response_text = "task cancelled, what would you like to do next?"
 
-    elif current_conversation_stage != "":
-        continued_conversation = continue_conversation(user_message, current_conversation_stage)
+    elif current_conversation_stage:
+        continued_conversation = continue_conversation(user_message, current_conversation_stage, conversation_history)
         current_conversation_stage = continued_conversation[1]
         response_text = continued_conversation[0]
 
@@ -51,6 +52,11 @@ def predict():
 
     chatbot_response_with_cookies = make_response(response_text)
     chatbot_response_with_cookies.set_cookie("conversationStage", current_conversation_stage)
+    if conversation_history:
+        updated_history = conversation_history + "|" + user_message
+        chatbot_response_with_cookies.set_cookie("chatHistory", updated_history)
+    else:
+        chatbot_response_with_cookies.set_cookie("chatHistory", user_message)
     return chatbot_response_with_cookies
 
 
@@ -87,19 +93,16 @@ def track(tracking_number):
 
 @app.route("/reviewStubEndpoint", methods=["POST"])
 def save_review():  # This is a stub API representing the review being successfully uploaded to the reviews database/spreadsheet
-    data = request.get_json()
-    print("Review raised for " + data.name
-          + " for product " + data.product
-          + " with a review of " + data.stars
-          + " stars and content: " + data.content)
+    data = request.data
+    print(data)
+    return "review created", 200
 
 
 @app.route("/supportStubEndpoint", methods=["POST"])
 def raise_ticket():  # This is a stub API representing the ticket being successfully uploaded to the support database
-    data = request.get_json()
-    print("Support Ticket raised for " + data.name
-          + " with contact details: " + data.email
-          + " with content: " + data.content)
+    data = request.data
+    print(data)
+    return "ticket raised", 200
 
 
 if __name__ == "__main__":
