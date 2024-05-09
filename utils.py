@@ -15,7 +15,7 @@ import constants
 
 def get_response(msg):
     os.environ["OPENAI_API_KEY"] = constants.APIKEY
-    company_information = digest_and_format_company_data('ecommerceBusinesses.pdf')
+    company_information = digest_and_format_company_data('Ecommerce Store Reference Data.pdf')
     vector_structure = OpenAIEmbeddings()
 
     searchable_document = FAISS.from_texts(company_information, vector_structure)

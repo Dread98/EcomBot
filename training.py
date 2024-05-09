@@ -6,6 +6,9 @@ import numpy as np
 from nltk.stem import WordNetLemmatizer
 import tensorflow as tf
 
+nltk.download('punkt')
+nltk.download('wordnet')
+
 lemmatizer = WordNetLemmatizer()  # reduces words to their stem (walking walks walker walk all become walk)
 
 intents = json.loads(open('intents.json').read())
